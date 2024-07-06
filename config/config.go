@@ -9,8 +9,8 @@ type Config struct {
 	Port string `json:"port"`
 }
 
-func LoadConfig(path string) (*Config, error) {
-	configFile, err := os.Open(path)
+func LoadConfig() (*Config, error) {
+	configFile, err := os.Open("config.json")
 	if err != nil {
 		return nil, err
 	}

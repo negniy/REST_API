@@ -8,17 +8,23 @@ import (
 	"os/signal"
 	"restapi/app/service"
 	"restapi/config"
+	"restapi/database"
 	"syscall"
 )
 
-func Run(cnf *config.Config) error {
+func Run() error {
 
-	cnf, err := config.LoadConfig("C:/Users/dstep/OneDrive/Рабочий_стол/REST_API/config.json")
+	cnf, err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
 
-	carService := service.NewService()
+	db, err := database.InitDB()
+	if err != nil {
+		log.Fatalf("Failed to find database: %v", err)
+	}
+
+	carService := service.NewService(*db)
 
 	router := http.NewServeMux()
 	router.HandleFunc("POST: /cars", carService.Create)
@@ -50,6 +56,7 @@ func Run(cnf *config.Config) error {
 }
 
 func main() {
+
 	if err := Run(); err != nil {
 		log.Fatalf("Server stopped with error: %v", err)
 	}
