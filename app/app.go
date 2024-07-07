@@ -43,7 +43,7 @@ func Run() error {
 		log.Printf("run server: http://localhost%s", cnf.Port)
 		err := srv.ListenAndServe()
 		if err != nil {
-			log.Printf("error when listen and serve", err)
+			log.Printf("error when listen and serve: %s", err)
 		}
 	}()
 
