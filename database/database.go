@@ -14,12 +14,48 @@ type CarsDB struct {
 }
 
 func InitDB() (*CarsDB, error) {
+	if _, err := os.Stat("database.json"); err != nil {
+		if os.IsNotExist(err) {
+			os.Create("database.json")
+			carList := make([]model.Car, 0, 10)
+			return &CarsDB{
+				carList:  carList,
+				fileName: "database.json",
+			}, nil
+		} else {
+			return nil, err
+		}
+	}
+
 	dbFile, err := os.Open("database.json")
 	if err != nil {
+		fmt.Println("Error with opening file:", err)
 		return nil, err
 	}
-	dbFile.Close()
-	carList := make([]model.Car, 0, 10)
+	defer dbFile.Close()
+
+	buf := make([]byte, 1024)
+	var data []byte
+
+	for {
+		n, err := dbFile.Read(buf)
+		if err != nil {
+			if err.Error() != "EOF" {
+				fmt.Println("Error reading file:", err)
+				return nil, err
+			}
+			break
+		}
+		data = append(data, buf[:n]...)
+	}
+
+	var carList []model.Car
+	err = json.Unmarshal(data, &carList)
+	if err != nil {
+		fmt.Println("Error unmarshaling JSON:", err)
+		return nil, err
+	}
+
 	return &CarsDB{
 		carList:  carList,
 		fileName: "database.json",
