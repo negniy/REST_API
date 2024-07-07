@@ -1,4 +1,4 @@
-package app
+package main
 
 import (
 	"context"
@@ -27,12 +27,12 @@ func Run() error {
 	carService := service.NewService(*db)
 
 	router := http.NewServeMux()
-	router.HandleFunc("POST: /cars", carService.Create)
-	router.HandleFunc("GET: /cars", carService.GetAll)
-	router.HandleFunc("GET: /cars/{id}", carService.Get)
-	router.HandleFunc("PUT: /cars/{id}", carService.Update)
-	router.HandleFunc("PATCH: /cars/{id}", carService.UpdateSomething)
-	router.HandleFunc("DELETE: /cars/{id}", carService.Delete)
+	router.HandleFunc("POST /cars", carService.Create)
+	router.HandleFunc("GET /cars", carService.GetAll)
+	router.HandleFunc("GET /cars/{id}", carService.Get)
+	router.HandleFunc("PUT /cars/{id}", carService.Update)
+	router.HandleFunc("PATCH /cars/{id}", carService.UpdateSomething)
+	router.HandleFunc("DELETE /cars/{id}", carService.Delete)
 
 	srv := http.Server{
 		Addr:    cnf.Port,
