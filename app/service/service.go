@@ -164,7 +164,7 @@ type UpdateSomethingRequest struct {
 }
 
 func (s *Service) UpdateSomething(w http.ResponseWriter, r *http.Request) {
-	idString := r.URL.Query().Get("id")
+	idString := r.PathValue("id")
 	id, err := strconv.Atoi(idString)
 	if err != nil {
 		responseError(w, http.StatusBadRequest, err)
@@ -209,10 +209,6 @@ func (s *Service) UpdateSomething(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response(w, http.StatusNoContent, nil)
-}
-
-type DeleteRequest struct {
-	ID int `json:"id"`
 }
 
 func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {

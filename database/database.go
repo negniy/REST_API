@@ -14,9 +14,35 @@ type CarsDB struct {
 }
 
 func InitDB() (*CarsDB, error) {
+
 	if _, err := os.Stat("database.json"); err != nil {
 		if os.IsNotExist(err) {
-			os.Create("database.json")
+
+			_, err := os.Create("database.json")
+			if err != nil {
+				fmt.Println("Error with creating file:", err)
+				return nil, err
+			}
+
+			dbFile, err := os.OpenFile("database.json", os.O_WRONLY, 0666)
+			if err != nil {
+				fmt.Println("Error with opening file:", err)
+				return nil, err
+			}
+			defer dbFile.Close()
+
+			emptyList := make([]model.Car, 0)
+			data, err := json.Marshal(emptyList)
+			if err != nil {
+				fmt.Println("Error with marshalling:", err)
+				return nil, err
+			}
+
+			_, err = dbFile.Write(data)
+			if err != nil {
+				fmt.Println("Error writing to file:", err)
+				return nil, err
+			}
 			carList := make([]model.Car, 0, 10)
 			return &CarsDB{
 				carList:  carList,
@@ -63,7 +89,8 @@ func InitDB() (*CarsDB, error) {
 }
 
 func (db *CarsDB) saveToFile() error {
-	dbFile, err := os.Open("database.json")
+
+	dbFile, err := os.OpenFile("database.json", os.O_WRONLY, 0666)
 	if err != nil {
 		fmt.Println("Error with opening file:", err)
 		return err
@@ -133,11 +160,14 @@ func (db *CarsDB) Delete(id int) error {
 	for i, car := range db.carList {
 		if i != id {
 			newdb[tmp] = car
+			newdb[tmp].ID = tmp
+			tmp++
 		}
-		tmp++
-	}
 
-	if err := db.saveToFile(); err != nil {
+	}
+	db.carList = newdb
+	err := db.saveToFile()
+	if err != nil {
 		return err
 	}
 	return nil
